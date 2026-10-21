@@ -136,6 +136,13 @@ public interface IStorageWrapper {
     void setSortBy(SortBy sortBy);
 
     /** Sorts the inventory, leaving no-sort and memory slots where they are. */
+    /**
+     * An upgrade was added, removed or saved its own state (a tank's fluid, a battery's charge),
+     * after the wrappers are up to date. Backpacks update what their model shows from it.
+     */
+    default void onUpgradeContentsChanged() {
+    }
+
     default void sort() {
         InventorySorter.sort(this);
     }

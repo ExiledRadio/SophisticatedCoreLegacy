@@ -100,6 +100,9 @@ public class UpgradeHandler extends ItemStackHandler {
         if (!justSavingNbtChange) {
             refreshUpgradeWrappers();
         }
+        if (owner != null) {
+            owner.onUpgradeContentsChanged();
+        }
     }
 
     public void saveInventory() {
