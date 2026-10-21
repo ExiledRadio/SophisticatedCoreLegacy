@@ -8,6 +8,7 @@ Adds what the smoking, blasting and stonecutter upgrades need; Storage 1.1.0 and
 - **Stonecutter upgrade** (from the original): a tab with the input, a scrolling grid of everything it can be cut into, and the result. The cuts come from VillagerBackport's and Future MC's stonecutters.
 - Detects a smoker, blast furnace or stonecutter from any mod (by block name); the upgrades that need one stay out of creative, JEI and recipes until a mod adds it.
 - Upgrade items can be hidden while what they need is missing.
+- **Shift-click goes to the storage first** with an upgrade tab open (a crafting grid, a furnace): items go to the open tab only once the storage is full, as the current original does. "Shift Click Into Open Tab First" in the settings is now off by default; turning it on brings back the old order.
 
 ## 1.1.0 (2026-10-20)
 

@@ -498,19 +498,24 @@ public abstract class StorageContainerBase extends Container implements ISyncedC
         ItemStack slotStack = slot.getStack();
         ItemStack original = slotStack.copy();
 
-        boolean intoOpenTab = !isUpgradeSlot(index) && getMainSetting(MainSettingsCategory.SHIFT_CLICK_INTO_OPEN_TAB_FIRST) && mergeIntoOpenTab(slotStack);
-        if (intoOpenTab) {
-            // Handled below like any other move.
-        } else if (index < getFirstPlayerSlot() || isUpgradeSlot(index)) {
-            if (isUpgradeSlot(index) && !canRemoveUpgrade(slot)) {
+        // The original's order: an open tab first only with that setting on, otherwise last.
+        boolean openTabFirst = getMainSetting(MainSettingsCategory.SHIFT_CLICK_INTO_OPEN_TAB_FIRST);
+        if (isUpgradeSlot(index)) {
+            if (!canRemoveUpgrade(slot) || !mergeItemStack(slotStack, getFirstPlayerSlot(), getFirstUpgradeSlot(), true)) {
                 return ItemStack.EMPTY;
             }
-            if (!mergeItemStack(slotStack, getFirstPlayerSlot(), getFirstUpgradeSlot(), true)) {
+        } else if (index < getFirstPlayerSlot()) {
+            boolean moved = openTabFirst ? mergeIntoOpenTab(slotStack) || mergeItemStack(slotStack, getFirstPlayerSlot(), getFirstUpgradeSlot(), true)
+                    : mergeItemStack(slotStack, getFirstPlayerSlot(), getFirstUpgradeSlot(), true) || mergeIntoOpenTab(slotStack);
+            if (!moved) {
                 return ItemStack.EMPTY;
             }
         } else {
-            boolean moved = slotStack.getItem() instanceof IUpgradeItem && mergeIntoUpgradeSlots(slotStack);
-            if (!moved && !mergeIntoBackpack(slotStack)) {
+            boolean moved = openTabFirst && mergeIntoOpenTab(slotStack);
+            moved = moved || (slotStack.getItem() instanceof IUpgradeItem && mergeIntoUpgradeSlots(slotStack));
+            moved = moved || mergeIntoBackpack(slotStack);
+            moved = moved || (!openTabFirst && mergeIntoOpenTab(slotStack));
+            if (!moved) {
                 return ItemStack.EMPTY;
             }
         }

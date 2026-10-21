@@ -17,7 +17,9 @@ import java.util.function.Consumer;
 public class MainSettingsCategory implements ISettingsCategory {
     public static final String NAME = "main";
 
-    public static final Setting SHIFT_CLICK_INTO_OPEN_TAB_FIRST = new Setting("shiftClickOpenTab", true);
+    // Off by default: shift-clicked items go to the storage before an open tab's slots, as the
+    // current original does (its 1.18 and 1.20 code had this on).
+    public static final Setting SHIFT_CLICK_INTO_OPEN_TAB_FIRST = new Setting("shiftClickOpenTab", false);
     public static final Setting KEEP_TAB_OPEN = new Setting("keepTabOpen", true);
     public static final Setting[] SETTINGS = {SHIFT_CLICK_INTO_OPEN_TAB_FIRST, KEEP_TAB_OPEN};
 
