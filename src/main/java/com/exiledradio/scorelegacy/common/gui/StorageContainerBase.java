@@ -545,7 +545,7 @@ public abstract class StorageContainerBase extends Container implements ISyncedC
         }
         ItemStack slotStack = slot.getStack();
         ItemStack original = slotStack.copy();
-        boolean isCraftingResult = slot instanceof SlotCrafting;
+        boolean isCraftingResult = slot instanceof SlotCrafting || slot instanceof IResultSlot;
         if (isCraftingResult) {
             slotStack.getItem().onCreated(slotStack, playerIn.world, playerIn);
         }

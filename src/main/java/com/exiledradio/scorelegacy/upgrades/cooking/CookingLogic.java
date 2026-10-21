@@ -22,13 +22,13 @@ import java.util.function.Predicate;
  * A furnace kept in the upgrade stack. Times are stored as world-time finish points rather
  * than counters, so a backpack that isn't ticking (in a chest, unloaded) doesn't need
  * catching up; pause() turns them back into durations when the upgrade is disabled.
- * 1.12 furnace recipes all take 200 ticks, the same as TileEntityFurnace.
+ * 1.12 furnace recipes all take 200 ticks, the same as TileEntityFurnace; the smoking and
+ * blasting types take half that and get half a fuel's burn time (see {@link CookingType}).
  */
 public class CookingLogic {
     public static final int COOK_INPUT_SLOT = 0;
     public static final int FUEL_SLOT = 1;
     public static final int COOK_OUTPUT_SLOT = 2;
-    private static final int VANILLA_COOK_TIME = 200;
     private static final String COOKING_INVENTORY_TAG = "cookingInventory";
 
     private final ItemStack upgrade;
@@ -37,6 +37,7 @@ public class CookingLogic {
     private final Predicate<ItemStack> isInput;
     private final double cookingSpeedMultiplier;
     private final double fuelEfficiencyMultiplier;
+    private final CookingType cookingType;
     private ItemStackHandler cookingInventory = null;
     private ItemStack cookingResult = ItemStack.EMPTY;
     private boolean cookingResultInitialized = false;
@@ -45,17 +46,31 @@ public class CookingLogic {
     private long remainingBurnTime = 0;
 
     public CookingLogic(ItemStack upgrade, Consumer<ItemStack> saveHandler, double cookingSpeedMultiplier, double fuelEfficiencyMultiplier) {
-        this(upgrade, saveHandler, s -> getBurnTime(s) > 0, s -> !getSmeltingResult(s).isEmpty(), cookingSpeedMultiplier, fuelEfficiencyMultiplier);
+        this(upgrade, saveHandler, CookingType.SMELTING, cookingSpeedMultiplier, fuelEfficiencyMultiplier);
+    }
+
+    public CookingLogic(ItemStack upgrade, Consumer<ItemStack> saveHandler, CookingType cookingType, double cookingSpeedMultiplier, double fuelEfficiencyMultiplier) {
+        this(upgrade, saveHandler, s -> getBurnTime(s) > 0, s -> !cookingType.getResult(s).isEmpty(), cookingType, cookingSpeedMultiplier, fuelEfficiencyMultiplier);
     }
 
     public CookingLogic(ItemStack upgrade, Consumer<ItemStack> saveHandler, Predicate<ItemStack> isFuel, Predicate<ItemStack> isInput,
                         double cookingSpeedMultiplier, double fuelEfficiencyMultiplier) {
+        this(upgrade, saveHandler, isFuel, isInput, CookingType.SMELTING, cookingSpeedMultiplier, fuelEfficiencyMultiplier);
+    }
+
+    public CookingLogic(ItemStack upgrade, Consumer<ItemStack> saveHandler, Predicate<ItemStack> isFuel, Predicate<ItemStack> isInput,
+                        CookingType cookingType, double cookingSpeedMultiplier, double fuelEfficiencyMultiplier) {
+        this.cookingType = cookingType;
         this.upgrade = upgrade;
         this.saveHandler = saveHandler;
         this.isFuel = isFuel;
         this.isInput = isInput;
         this.cookingSpeedMultiplier = cookingSpeedMultiplier;
         this.fuelEfficiencyMultiplier = fuelEfficiencyMultiplier;
+    }
+
+    public CookingType getCookingType() {
+        return cookingType;
     }
 
     public static ItemStack getSmeltingResult(ItemStack input) {
@@ -122,7 +137,7 @@ public class CookingLogic {
 
     private ItemStack getCookingResult() {
         if (!cookingResultInitialized) {
-            cookingResult = getSmeltingResult(getCookInput());
+            cookingResult = cookingType.getResult(getCookInput());
             cookingResultInitialized = true;
         }
         return cookingResult;
@@ -152,7 +167,7 @@ public class CookingLogic {
     }
 
     private int getCookTime() {
-        return (int) (VANILLA_COOK_TIME * (1 / cookingSpeedMultiplier));
+        return (int) (cookingType.getCookTime() * (1 / cookingSpeedMultiplier));
     }
 
     private boolean finishedCooking(World world) {
@@ -205,7 +220,7 @@ public class CookingLogic {
         if (isBurning(world) || !canSmelt(result)) {
             return;
         }
-        int burnTime = getBurnTime(fuel);
+        int burnTime = (int) (getBurnTime(fuel) * cookingType.getBurnTimeModifier());
         if (burnTime <= 0) {
             return;
         }

@@ -36,15 +36,16 @@ public class AutoSmeltingUpgradeWrapper extends UpgradeWrapperBase<AutoSmeltingU
     public AutoSmeltingUpgradeWrapper(IStorageWrapper storageWrapper, ItemStack upgrade, Consumer<ItemStack> upgradeSaveHandler) {
         super(storageWrapper, upgrade, upgradeSaveHandler);
         AutoCookingUpgradeConfig config = upgradeItem.getConfig();
+        CookingType cookingType = upgradeItem.getCookingType();
         inputFilterLogic = new FilterLogic(upgrade, upgradeSaveHandler, config.inputFilterSlots,
-                s -> !CookingLogic.getSmeltingResult(s).isEmpty(), "inputFilter");
+                s -> !cookingType.getResult(s).isEmpty(), "inputFilter");
         fuelFilterLogic = new FilterLogic(upgrade, upgradeSaveHandler, config.fuelFilterSlots,
                 s -> CookingLogic.getBurnTime(s) > 0, "fuelFilter");
         fuelFilterLogic.setAllowByDefault();
         fuelFilterLogic.setEmptyAllowListMatchesEverything();
-        isValidInput = s -> !CookingLogic.getSmeltingResult(s).isEmpty() && inputFilterLogic.matchesFilter(s);
+        isValidInput = s -> !cookingType.getResult(s).isEmpty() && inputFilterLogic.matchesFilter(s);
         isValidFuel = s -> CookingLogic.getBurnTime(s) > 0 && fuelFilterLogic.matchesFilter(s);
-        cookingLogic = new CookingLogic(upgrade, upgradeSaveHandler, isValidFuel, isValidInput, config.cookingSpeedMultiplier, config.fuelEfficiencyMultiplier);
+        cookingLogic = new CookingLogic(upgrade, upgradeSaveHandler, isValidFuel, isValidInput, cookingType, config.cookingSpeedMultiplier, config.fuelEfficiencyMultiplier);
     }
 
     @Override

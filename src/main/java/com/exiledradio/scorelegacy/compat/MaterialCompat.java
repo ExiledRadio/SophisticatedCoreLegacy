@@ -36,7 +36,12 @@ import java.util.Locale;
  * <li>netherite: {@code ingotNetherite} (Future MC, Nether Backport); the netherite mods that
  * register no ore name are added to it here;</li>
  * <li>crimson and warped: Nether Backport's or Farmer's Future Delight's planks, put in the ore
- * dictionary here as {@code plankCrimson} / {@code slabCrimson} and the warped ones.</li>
+ * dictionary here as {@code plankCrimson} / {@code slabCrimson} and the warped ones;</li>
+ * <li>the smoker, blast furnace and stonecutter, for the original's smoking, blasting and
+ * stonecutter upgrades: any mod's block named {@code smoker}, {@code blast_furnace} or
+ * {@code stonecutter} (Future MC, VillagerBackport...), put in the ore dictionary here under
+ * this mod's own names. The stonecutter also needs a mod whose stonecutter recipes the upgrade
+ * can read (see {@link BackportRecipes}).</li>
  * </ul>
  * Checked in Core's postInit, once every mod has registered its items and ore names (Core's
  * dependents' postInit comes after it). Each mod then loads the recipes that need a material from
@@ -47,7 +52,10 @@ public final class MaterialCompat {
         COPPER("ingotCopper"),
         NETHERITE("ingotNetherite"),
         CRIMSON("plankCrimson"),
-        WARPED("plankWarped");
+        WARPED("plankWarped"),
+        SMOKER("sophisticatedSmoker"),
+        BLAST_FURNACE("sophisticatedBlastFurnace"),
+        STONECUTTER("sophisticatedStonecutter");
 
         private final String oreName;
         private boolean available = false;
@@ -63,6 +71,11 @@ public final class MaterialCompat {
 
         public String getFolder() {
             return name().toLowerCase(Locale.ROOT);
+        }
+
+        /** The ore name recipes use for it. */
+        public String getOreName() {
+            return oreName;
         }
     }
 
@@ -89,8 +102,12 @@ public final class MaterialCompat {
         addOreNames("plankWarped", WARPED_PLANKS);
         addOreNames("slabCrimson", CRIMSON_SLABS);
         addOreNames("slabWarped", WARPED_SLABS);
+        addWorkstationOreNames(Material.SMOKER.oreName, "smoker");
+        addWorkstationOreNames(Material.BLAST_FURNACE.oreName, "blast_furnace");
+        addWorkstationOreNames(Material.STONECUTTER.oreName, "stonecutter");
         for (Material material : Material.values()) {
-            material.available = !OreDictionary.getOres(material.oreName, false).isEmpty();
+            material.available = !OreDictionary.getOres(material.oreName, false).isEmpty()
+                    && (material != Material.STONECUTTER || BackportRecipes.hasStonecutterRecipes() || hasDevStandIn(material));
             SophisticatedCoreLegacy.LOGGER.info("{}: {}", material.oreName, material.available ? "found" : "not found");
         }
     }
@@ -125,6 +142,7 @@ public final class MaterialCompat {
         if (!file.isFile()) {
             return;
         }
+        devStandInsLoaded = true;
         try {
             for (String line : Files.readAllLines(file.toPath())) {
                 String[] parts = line.trim().split("=");
@@ -141,6 +159,24 @@ public final class MaterialCompat {
         } catch (IOException | RuntimeException e) {
             SophisticatedCoreLegacy.LOGGER.error("Couldn't read {}", file, e);
         }
+    }
+
+    /** Every mod's block with this registry path (a backported workstation) goes under the ore name. */
+    private static void addWorkstationOreNames(String oreName, String path) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        for (ResourceLocation name : Block.REGISTRY.getKeys()) {
+            if (!"minecraft".equals(name.getNamespace()) && path.equals(name.getPath())) {
+                names.add(name.toString());
+            }
+        }
+        addOreNames(oreName, names.toArray(new String[0]));
+    }
+
+    private static boolean devStandInsLoaded = false;
+
+    /** Whether the dev run's stand-in file gave this material an item (dev runs can't load the mods). */
+    private static boolean hasDevStandIn(Material material) {
+        return devStandInsLoaded && !OreDictionary.getOres(material.oreName, false).isEmpty();
     }
 
     /** Puts the items that exist under an ore name, unless one of them already has it. */

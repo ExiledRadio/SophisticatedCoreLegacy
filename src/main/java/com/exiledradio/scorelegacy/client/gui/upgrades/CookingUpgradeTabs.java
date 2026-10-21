@@ -5,6 +5,7 @@ package com.exiledradio.scorelegacy.client.gui.upgrades;
 
 import com.exiledradio.scorelegacy.config.AutoCookingUpgradeConfig;
 import com.exiledradio.scorelegacy.upgrades.cooking.AutoSmeltingUpgradeItem;
+import com.exiledradio.scorelegacy.upgrades.cooking.SmeltingUpgradeItem;
 import com.exiledradio.scorelegacy.client.gui.StorageScreenBase;
 import com.exiledradio.scorelegacy.client.gui.UpgradeSettingsTab;
 import com.exiledradio.scorelegacy.client.gui.filter.FilterLogicControl;
@@ -22,7 +23,7 @@ public final class CookingUpgradeTabs {
         private final CookingLogicControl cookingLogicControl;
 
         public SmeltingTab(SmeltingUpgradeContainer container, Position position, StorageScreenBase screen) {
-            super(container, position, screen, "smelting");
+            super(container, position, screen, ((SmeltingUpgradeItem) container.getUpgradeStack().getItem()).getCookingType().getName());
             cookingLogicControl = addHideableChild(new CookingLogicControl(new Position(x + 3, y + 24), container.getCookingLogicContainer()));
         }
 
@@ -38,7 +39,7 @@ public final class CookingUpgradeTabs {
         private final CookingLogicControl cookingLogicControl;
 
         public AutoSmeltingTab(AutoSmeltingUpgradeContainer container, Position position, StorageScreenBase screen) {
-            super(container, position, screen, "auto_smelting");
+            super(container, position, screen, "auto_" + ((AutoSmeltingUpgradeItem) container.getUpgradeStack().getItem()).getCookingType().getName());
             AutoCookingUpgradeConfig config = ((AutoSmeltingUpgradeItem) container.getUpgradeStack().getItem()).getConfig();
             inputFilterLogicControl = addHideableChild(new FilterLogicControl.Advanced(screen, new Position(x + 3, y + 24),
                     container.getInputFilterLogicContainer(), config.inputFilterSlotsInRow));

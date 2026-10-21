@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 (2026-10-21)
+
+Adds what the smoking, blasting and stonecutter upgrades need; Storage 1.1.0 and Backpacks 1.0.0 require 1.2.0.
+
+- **Smoking and blasting** (from the original): the cooking upgrades can smoke or blast instead of smelt. They cook in half a furnace's time and get half a fuel's burn time, so a piece of fuel still does as many items. 1.12 has no smoking or blasting recipes, so a smoker cooks whatever smelts into food and a blast furnace whatever is an ore or smelts into an ingot or gem (VillagerBackport's rules), plus Future MC's own smoker and blast furnace lists.
+- **Stonecutter upgrade** (from the original): a tab with the input, a scrolling grid of everything it can be cut into, and the result. The cuts come from VillagerBackport's and Future MC's stonecutters.
+- Detects a smoker, blast furnace or stonecutter from any mod (by block name); the upgrades that need one stay out of creative, JEI and recipes until a mod adds it.
+- Upgrade items can be hidden while what they need is missing.
+
 ## 1.1.0 (2026-10-20)
 
 Adds what the new Storage and Backpacks features need; both now require 1.1.0.

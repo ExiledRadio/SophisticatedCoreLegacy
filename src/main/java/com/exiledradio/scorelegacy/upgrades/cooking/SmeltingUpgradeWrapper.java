@@ -22,7 +22,7 @@ public class SmeltingUpgradeWrapper extends UpgradeWrapperBase<SmeltingUpgradeWr
 
     public SmeltingUpgradeWrapper(IStorageWrapper storageWrapper, ItemStack upgrade, Consumer<ItemStack> upgradeSaveHandler) {
         super(storageWrapper, upgrade, upgradeSaveHandler);
-        cookingLogic = new CookingLogic(upgrade, upgradeSaveHandler, upgradeItem.getConfig().cookingSpeedMultiplier,
+        cookingLogic = new CookingLogic(upgrade, upgradeSaveHandler, upgradeItem.getCookingType(), upgradeItem.getConfig().cookingSpeedMultiplier,
                 upgradeItem.getConfig().fuelEfficiencyMultiplier);
     }
 

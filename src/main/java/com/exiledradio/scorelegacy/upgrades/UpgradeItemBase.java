@@ -30,6 +30,21 @@ public abstract class UpgradeItemBase<T extends IUpgradeWrapper> extends Item im
         setCreativeTab(tab);
     }
 
+    /**
+     * False for an upgrade whose block no installed mod adds (the smoking, blasting and
+     * stonecutter upgrades): the item stays registered, so worlds keep it, but isn't listed.
+     */
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public void getSubItems(@Nonnull CreativeTabs tab, @Nonnull net.minecraft.util.NonNullList<ItemStack> items) {
+        if (isAvailable()) {
+            super.getSubItems(tab, items);
+        }
+    }
+
     // Item.addInformation is client-only; FML strips this override on a dedicated server.
     @SideOnly(Side.CLIENT)
     @Override

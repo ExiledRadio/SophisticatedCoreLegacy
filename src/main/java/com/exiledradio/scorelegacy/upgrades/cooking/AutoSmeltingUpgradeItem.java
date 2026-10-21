@@ -19,10 +19,27 @@ public class AutoSmeltingUpgradeItem extends UpgradeItemBase<AutoSmeltingUpgrade
     public static final UpgradeType<AutoSmeltingUpgradeWrapper> TYPE = new UpgradeType<>(AutoSmeltingUpgradeWrapper::new);
 
     private final AutoCookingUpgradeConfig config;
+    private final CookingType cookingType;
 
     public AutoSmeltingUpgradeItem(String name, CreativeTabs tab, AutoCookingUpgradeConfig config) {
+        this(name, tab, config, CookingType.SMELTING);
+    }
+
+    /** A smoking or blasting upgrade (the original's SmokingUpgradeItem, BlastingUpgradeItem and their auto versions). */
+    public AutoSmeltingUpgradeItem(String name, CreativeTabs tab, AutoCookingUpgradeConfig config, CookingType cookingType) {
         super(name, tab);
         this.config = config;
+        this.cookingType = cookingType;
+    }
+
+    public CookingType getCookingType() {
+        return cookingType;
+    }
+
+    /** Smoking and blasting only show up when a mod adds a smoker or blast furnace. */
+    @Override
+    public boolean isAvailable() {
+        return cookingType.isAvailable();
     }
 
     public AutoCookingUpgradeConfig getConfig() {
