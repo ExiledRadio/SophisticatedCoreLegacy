@@ -1,0 +1,13 @@
+/*
+ * Modified from Sophisticated Backpacks (c) P3pp3rF1y, GPLv3. Ported to 1.12.2 by ExiledRadio.
+ */
+package com.exiledradio.scorelegacy.api;
+
+import com.exiledradio.scorelegacy.util.IItemHandlerSimpleInserter;
+import net.minecraft.item.ItemStack;
+
+public interface IInsertResponseUpgrade {
+    ItemStack onBeforeInsert(IItemHandlerSimpleInserter inventoryHandler, int slot, ItemStack stack, boolean simulate);
+
+    void onAfterInsert(IItemHandlerSimpleInserter inventoryHandler, int slot);
+}
